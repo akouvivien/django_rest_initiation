@@ -1,4 +1,5 @@
 from django.shortcuts import render
+from django.contrib.auth.models import User
 from rest_framework import permissions
 from rest_framework import viewsets
 from rest_framework.response import Response
@@ -42,6 +43,9 @@ class AuthorViewSet(viewsets.ModelViewSet):
 
         # Valider le serializer.
         if serializer.is_valid():
+
+            # Associer l'utilisateur actuel à la modification
+            serializer.created_by = request.user 
             # Enregistrer l'objet dans la base de données.
             serializer.save()
 
@@ -65,13 +69,16 @@ class AuthorViewSet(viewsets.ModelViewSet):
     def update(self, request, *args, **kwargs):
         # Récupère l'objet.
         _object = self.get_object()
-        
+
+        # Associer l'utilisateur actuel à la modification
+        _object.modified_by = request.user  
 
         # Sérialiser les données de la demande.
         serializer = self.serializer_class(_object, data=request.data)
 
         # Valider le serializer.
         if serializer.is_valid():
+
             # Mettre à jour l'objet dans la base de données.
             serializer.save()
 
@@ -84,17 +91,16 @@ class AuthorViewSet(viewsets.ModelViewSet):
         # Récupère l'objet.
         _object = self.get_object()
 
+        # Vérifie si l'objet existe.
+        if _object:
         # Supprimer l'objet de la base de données.
-        _object.is_available = False
-        
-        # Vérifie si l'objet a été supprimé avec succès.
-        if _object.is_available:
+            _object.is_available = False
             _object.save()
             # Affiche un message indiquant que la suppression a été effectuée.
             return Response({'message': 'L\'auteur a été supprimé.'}, status=204)
         else:
             # Affiche un message indiquant que la suppression a échoué.
-            return Response({'message': 'La suppression a échoué.'}, status=400)
+            return Response({'message': 'La suppression a échoué ou l\'objet n\'existe pas.'}, status=400)
         
 
 
@@ -123,6 +129,9 @@ class BookViewSet(viewsets.ModelViewSet):
 
         # Valider le serializer.
         if serializer.is_valid():
+
+             # Associer l'utilisateur actuel à la modification
+            serializer.created_by = request.user 
             # Enregistrer l'objet dans la base de données.
             serializer.save()
 
@@ -133,7 +142,7 @@ class BookViewSet(viewsets.ModelViewSet):
 
     def retrieve(self, request, *args, **kwargs):
         # Récupère l'objet.
-        _object = self.queryset.get(pk=pk, book=request.book)
+        _object = self.get_object()
 
         # Sérialiser l'objet.
         serializer = self.serializer_class(_object)
@@ -145,13 +154,17 @@ class BookViewSet(viewsets.ModelViewSet):
 
     def update(self, request, *args, **kwargs):
         # Récupère l'objet.
-        _object = self.queryset.get(pk=pk, book=request.book)
+        _object = self.get_object()
+
+        # Associer l'utilisateur actuel à la modification
+        _object.modified_by = request.user  
 
         # Sérialiser les données de la demande.
         serializer = self.serializer_class(_object, data=request.data)
 
         # Valider le serializer.
         if serializer.is_valid():
+
             # Mettre à jour l'objet dans la base de données.
             serializer.save()
 
@@ -162,15 +175,19 @@ class BookViewSet(viewsets.ModelViewSet):
 
     def destroy(self, request, *args, **kwargs):
         # Récupère l'objet.
-        _object = self.queryset.get(pk=pk, book=request.book)
+        _object = self.get_object()
 
-        # Supprimer l'objet de la base de données.
-        _object.is_available= False
-        
-        # Vérifie si l'objet a été supprimé avec succès.
-        if _object.is_available:
-            _object.save()
+        # Vérifie si l'objet existe.
+        if _object:
+
+             # Supprimer l'objet de la base de données.
+            _object.is_available = False
+
+            # Associer l'utilisateur actuel à la modification
+            _object.modified_by = request.user 
             
+            _object.save()
+        
             # Affiche un message indiquant que la suppression a été effectuée.
             return Response({'message': 'Le livre a été supprimé.'}, status=204)
         else:
