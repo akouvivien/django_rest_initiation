@@ -5,22 +5,33 @@ from rest_framework.response import Response
 from crudProjet_api.models import Author, Book
 from crudProjet_api.serializers import AuthorSerializer, BookSerializer
 
+#viewsets
+""" 
+Actions CRUD prédéfinies : Les ViewSets fournissent des actions prédéfinies pour effectuer les opérations CRUD (Create, Retrieve, Update, Delete) sur un modèle. 
+Les actions telles que list(), create(), retrieve(), update(), partial_update(), et destroy() sont déjà implémentées et peuvent être utilisées directement.
 
+Routage automatique : Les ViewSets sont conçus pour fonctionner avec les routeurs de Django REST Framework.
+Les routes URL pour chaque action du ViewSet (par exemple, list(), retrieve(), etc.) sont automatiquement générées par le routeur.
+Cela facilite la gestion des URL et les associe automatiquement aux actions appropriées. et plus d'autres.....
+
+
+"""
 class AuthorViewSet(viewsets.ModelViewSet):
+    #affiche tous les object dont la variable is_available est definit a True, pas encore supprimé
     queryset = Author.objects.filter(is_available=True)
     serializer_class = AuthorSerializer
     permission_classes = [permissions.IsAuthenticated]
     
-    def list(self, request):
+    def list(self, request, *args, **kwargs):
         # Récupère la liste des objets.
-        _objects = self.queryset.filter(author=request.author)
+        _objects = self.filter_queryset(self.get_queryset())
 
         # Sérialiser les objets.
         serializer = self.serializer_class(_objects, many=True)
 
         return Response(serializer.data)
 
-    def create(self, request):
+    def create(self, request, *args, **kwargs):
         # Sérialiser les données de la demande.
         serializer = self.serializer_class(data=request.data)
         
@@ -39,9 +50,9 @@ class AuthorViewSet(viewsets.ModelViewSet):
 
         return Response(serializer.errors, status=400)
 
-    def retrieve(self, request, pk):
+    def retrieve(self, request, *args, **kwargs):
         # Récupère l'objet.
-        _object = self.queryset.get(pk=pk, author=request.author)
+        _object = self.get_object()
 
         # Sérialiser l'objet.
         serializer = self.serializer_class(_object)
@@ -51,9 +62,10 @@ class AuthorViewSet(viewsets.ModelViewSet):
         return Response(serializer.errors, status=400)
         
 
-    def update(self, request, pk):
+    def update(self, request, *args, **kwargs):
         # Récupère l'objet.
-        _object = self.queryset.get(pk=pk, author=request.author)
+        _object = self.get_object()
+        
 
         # Sérialiser les données de la demande.
         serializer = self.serializer_class(_object, data=request.data)
@@ -68,9 +80,9 @@ class AuthorViewSet(viewsets.ModelViewSet):
 
         return Response(serializer.errors, status=400)
 
-    def destroy(self, request, pk):
+    def destroy(self, request, *args, **kwargs):
         # Récupère l'objet.
-        _object = self.queryset.get(pk=pk)
+        _object = self.get_object()
 
         # Supprimer l'objet de la base de données.
         _object.is_available = False
@@ -87,20 +99,21 @@ class AuthorViewSet(viewsets.ModelViewSet):
 
 
 class BookViewSet(viewsets.ModelViewSet):
+    #affiche tous les object dont la variable is_available est definit a True, pas encore supprimée
     queryset = Book.objects.filter(is_available=True)
     serializer_class = BookSerializer
     permission_classes = permission_classes = [permissions.IsAuthenticated]
     
-    def list(self, request):
+    def list(self, request, *args, **kwargs):
         # Récupère la liste des objets.
-        _objects = self.queryset.filter(book=request.book)
+        _objects =  self.filter_queryset(self.get_queryset())
 
         # Sérialiser les objets.
         serializer = self.serializer_class(_objects, many=True)
 
         return Response(serializer.data)
 
-    def create(self, request):
+    def create(self, request, *args, **kwargs):
         # Sérialiser les données de la demande.
         serializer = self.serializer_class(data=request.data)
         title = request.data.get('title')
@@ -118,7 +131,7 @@ class BookViewSet(viewsets.ModelViewSet):
 
         return Response({"message": " une erreur c\'est produite lors de la creation du livre "},serializer.errors, status=400)
 
-    def retrieve(self, request, pk):
+    def retrieve(self, request, *args, **kwargs):
         # Récupère l'objet.
         _object = self.queryset.get(pk=pk, book=request.book)
 
@@ -130,7 +143,7 @@ class BookViewSet(viewsets.ModelViewSet):
         return Response(serializer.errors, status=400)
         
 
-    def update(self, request, pk):
+    def update(self, request, *args, **kwargs):
         # Récupère l'objet.
         _object = self.queryset.get(pk=pk, book=request.book)
 
@@ -147,7 +160,7 @@ class BookViewSet(viewsets.ModelViewSet):
 
         return Response(serializer.errors, status=400)
 
-    def destroy(self, request, pk):
+    def destroy(self, request, *args, **kwargs):
         # Récupère l'objet.
         _object = self.queryset.get(pk=pk, book=request.book)
 
