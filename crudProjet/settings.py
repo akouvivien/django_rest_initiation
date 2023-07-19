@@ -38,8 +38,10 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'rest_framework',
-   # 'djanho_filters',
-    'crudProjet_api'
+    'crudProjet_api',
+    # 'djanho_filters',
+    #'auditlog',
+ 
 ]
 
 MIDDLEWARE = [
