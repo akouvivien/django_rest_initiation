@@ -12,6 +12,10 @@ https://docs.djangoproject.com/en/4.2/ref/settings/
 
 from pathlib import Path
 
+from datetime import timedelta
+
+from django.core.management.utils import get_random_secret_key
+
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -41,6 +45,7 @@ INSTALLED_APPS = [
     'crudProjet_api',
     # 'djanho_filters',
     #'auditlog',
+    'rest_framework_simplejwt'
  
 ]
 
@@ -104,10 +109,49 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
+
+
+SECRET_KEY = get_random_secret_key()
+
+SIMPLE_JWT = {
+    # Durée de vie (expiration) du jeton d'accès
+    'ACCESS_TOKEN_LIFETIME': timedelta(days=15),
+    # Durée de vie (expiration) du jeton de rafraîchissement
+    'REFRESH_TOKEN_LIFETIME': timedelta(days=1),
+    # Autoriser le rafraîchissement à chaque demande
+    'SLIDING_TOKEN_REFRESH_LIFETIME': timedelta(minutes=5),
+    # Durée de vie (expiration) du jeton d'accès lors du rafraîchissement
+    'SLIDING_TOKEN_LIFETIME': timedelta(days=1),
+    # Le reste de la configuration reste inchangée...
+    'ROTATE_REFRESH_TOKENS': True,
+    'BLACKLIST_AFTER_ROTATION': True,
+    'ALGORITHM': 'HS256',
+    'SIGNING_KEY': settings.SECRET_KEY,
+    'VERIFYING_KEY': None,
+    'AUDIENCE': None,
+    'ISSUER': None,
+    'AUTH_HEADER_TYPES': ('Bearer',),
+    'USER_ID_FIELD': 'id',
+    'USER_ID_CLAIM': 'user_id',
+    'AUTH_TOKEN_CLASSES': ('rest_framework_simplejwt.tokens.AccessToken',),
+    'TOKEN_TYPE_CLAIM': 'token_type',
+    'JTI_CLAIM': 'jti',
+    'SLIDING_TOKEN_REFRESH_EXP_CLAIM': 'refresh_exp',
+}
+
 REST_FRAMEWORK = {
     'DEFAULT_PAGINATION_CLASS':'rest_framework.pagination.PageNumberPagination','PAGE_SIZE': 10,
-    #'DEFAULT_FILTER_BACKENDS' :'django_filters.rest_framework.DjangoFilter'
+    'DEFAULT_PERMISSION_CLASSES': [
+    'rest_framework.permissions.DjangoModelPermissionsOrAnonReadOnly'
+    ],
+    'DEFAULT_FILTER_BACKENDS': [
+    'django_filters.rest_framework.DjangoFilterBackend'
+    ],
+    'DEFAULT_AUTHENTICATION_CLASSES': [
+        'rest_framework_simplejwt.authentication.JWTAuthentication',
+    ],
 }
+
 
 # Internationalization
 # https://docs.djangoproject.com/en/4.2/topics/i18n/

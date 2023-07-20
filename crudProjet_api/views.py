@@ -6,6 +6,12 @@ from rest_framework.response import Response
 from crudProjet_api.models import Author, Book
 from crudProjet_api.serializers import AuthorSerializer, BookSerializer
 
+#section import pour les tokens
+from rest_framework_simplejwt.views import TokenObtainPairView
+from rest_framework.permissions import AllowAny
+from .serializers import MyTokenObtainPairSerializer
+
+
 #viewsets
 """ 
 Actions CRUD prédéfinies : Les ViewSets fournissent des actions prédéfinies pour effectuer les opérations CRUD (Create, Retrieve, Update, Delete) sur un modèle. 
@@ -17,6 +23,13 @@ Cela facilite la gestion des URL et les associe automatiquement aux actions appr
 
 
 """
+
+
+
+class MyObtainTokenPairView(TokenObtainPairView):
+    permission_classes = (AllowAny,)
+    serializer_class = MyTokenObtainPairSerializer
+
 class AuthorViewSet(viewsets.ModelViewSet):
     #affiche tous les object dont la variable is_available est definit a True, pas encore supprimé
     queryset = Author.objects.filter(is_available=True)
@@ -108,7 +121,7 @@ class BookViewSet(viewsets.ModelViewSet):
     #affiche tous les object dont la variable is_available est definit a True, pas encore supprimée
     queryset = Book.objects.filter(is_available=True)
     serializer_class = BookSerializer
-    permission_classes = permission_classes = [permissions.IsAuthenticated]
+    permission_classes = [permissions.IsAuthenticated]
     
     def list(self, request, *args, **kwargs):
         # Récupère la liste des objets.
