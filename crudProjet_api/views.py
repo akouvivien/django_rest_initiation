@@ -6,10 +6,15 @@ from rest_framework.response import Response
 from crudProjet_api.models import Author, Book
 from crudProjet_api.serializers import AuthorSerializer, BookSerializer
 
+from .serializers import RegisterSerializer
+from rest_framework import generics
+
 #section import pour les tokens
 from rest_framework_simplejwt.views import TokenObtainPairView
 from rest_framework.permissions import AllowAny
 from .serializers import MyTokenObtainPairSerializer
+
+
 
 
 #viewsets
@@ -25,6 +30,12 @@ Cela facilite la gestion des URL et les associe automatiquement aux actions appr
 """
 
 
+
+
+class RegisterView(generics.CreateAPIView):
+    queryset = User.objects.all()
+    permission_classes = (AllowAny,)
+    serializer_class = RegisterSerializer
 
 class MyObtainTokenPairView(TokenObtainPairView):
     permission_classes = (AllowAny,)
@@ -49,16 +60,17 @@ class AuthorViewSet(viewsets.ModelViewSet):
         # Sérialiser les données de la demande.
         serializer = self.serializer_class(data=request.data)
         
-        name = request.data.get('name')
+        name = request.data.get('author_name')
         # Vérification si l'auteur existe déjà
-        if Author.objects.filter(name=name).exists():
+        if Author.objects.filter(author_name=name).exists():
             return Response({"error": "L\'auteur existe déjà."}, status=400)
 
         # Valider le serializer.
         if serializer.is_valid():
 
-            # Associer l'utilisateur actuel à la modification
-            serializer.created_by = request.user 
+            # Associer l'utilisateur actuel à la création
+            serializer.validated_data['created_by'] = request.user
+
             # Enregistrer l'objet dans la base de données.
             serializer.save()
 
@@ -67,16 +79,7 @@ class AuthorViewSet(viewsets.ModelViewSet):
 
         return Response(serializer.errors, status=400)
 
-    def retrieve(self, request, *args, **kwargs):
-        # Récupère l'objet.
-        _object = self.get_object()
 
-        # Sérialiser l'objet.
-        serializer = self.serializer_class(_object)
-        if serializer.is_valid():
-            return Response(serializer.data)
-        
-        return Response(serializer.errors, status=400)
         
 
     def update(self, request, *args, **kwargs):
@@ -153,16 +156,6 @@ class BookViewSet(viewsets.ModelViewSet):
 
         return Response({"message": " une erreur c\'est produite lors de la creation du livre "},serializer.errors, status=400)
 
-    def retrieve(self, request, *args, **kwargs):
-        # Récupère l'objet.
-        _object = self.get_object()
-
-        # Sérialiser l'objet.
-        serializer = self.serializer_class(_object)
-        if serializer.is_valid():
-            return Response(serializer.data)
-        
-        return Response(serializer.errors, status=400)
         
 
     def update(self, request, *args, **kwargs):

@@ -111,7 +111,7 @@ AUTH_PASSWORD_VALIDATORS = [
 
 
 
-SECRET_KEY = get_random_secret_key()
+#SECRET_KEY = get_random_secret_key()
 
 SIMPLE_JWT = {
     # Durée de vie (expiration) du jeton d'accès
@@ -126,7 +126,7 @@ SIMPLE_JWT = {
     'ROTATE_REFRESH_TOKENS': True,
     'BLACKLIST_AFTER_ROTATION': True,
     'ALGORITHM': 'HS256',
-    'SIGNING_KEY': settings.SECRET_KEY,
+    'SIGNING_KEY': get_random_secret_key(),
     'VERIFYING_KEY': None,
     'AUDIENCE': None,
     'ISSUER': None,
@@ -144,9 +144,9 @@ REST_FRAMEWORK = {
     'DEFAULT_PERMISSION_CLASSES': [
     'rest_framework.permissions.DjangoModelPermissionsOrAnonReadOnly'
     ],
-    'DEFAULT_FILTER_BACKENDS': [
-    'django_filters.rest_framework.DjangoFilterBackend'
-    ],
+    #'DEFAULT_FILTER_BACKENDS': [
+    #'django_filters.rest_framework.DjangoFilterBackend'
+    #],
     'DEFAULT_AUTHENTICATION_CLASSES': [
         'rest_framework_simplejwt.authentication.JWTAuthentication',
     ],
