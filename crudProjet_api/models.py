@@ -3,7 +3,11 @@ from django.contrib.auth.models import User
 from django.db import models
 
 class Author(models.Model):
-    author_name = models.CharField(max_length=100,unique=True, null=False, blank=False),
+    author_name = models.CharField(max_length=100,unique=True, null=False, blank=False,
+                                   error_messages={
+                                       'blank': "Le champ 'name' ne peut pas être vide.",
+                                   })
+    
     #par defaut la variable is_available est defini a true cette variable sera modifier a la suppression
     is_available = models.BooleanField(default=True)
 
@@ -22,8 +26,12 @@ class Author(models.Model):
         return self.name
 
 class Book(models.Model):
-    title = models.CharField(max_length=100,unique=True, null=False, blank=False)
-    author = models.ManyToManyField(Author, related_name='books'),
+    title = models.CharField(max_length=100,unique=True, null=False, blank=False,
+                                   error_messages={
+                                       'blank': "Le champ 'title' ne peut pas être vide.",
+                                   })
+    author = models.ManyToManyField(Author, related_name='books')
+
     #par defaut la variable is_available est defini a true cette variable sera modifier a la suppression
     is_available = models.BooleanField(default=True)
     

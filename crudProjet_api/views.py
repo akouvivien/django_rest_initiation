@@ -37,6 +37,18 @@ class RegisterView(generics.CreateAPIView):
     permission_classes = (AllowAny,)
     serializer_class = RegisterSerializer
 
+class ChangePasswordView(generics.UpdateAPIView):
+
+    queryset = User.objects.all()
+    permission_classes = [permissions.IsAuthenticated]
+    serializer_class = ChangePasswordSerializer
+
+class UpdateProfileView(generics.UpdateAPIView):
+
+    queryset = User.objects.all()
+    permission_classes = [permissions.IsAuthenticated]
+    serializer_class = UpdateUserSerializer
+
 class MyObtainTokenPairView(TokenObtainPairView):
     permission_classes = (AllowAny,)
     serializer_class = MyTokenObtainPairSerializer
@@ -60,10 +72,10 @@ class AuthorViewSet(viewsets.ModelViewSet):
         # Sérialiser les données de la demande.
         serializer = self.serializer_class(data=request.data)
         
-        name = request.data.get('author_name')
+        #name = request.data.get('author_name')
         # Vérification si l'auteur existe déjà
-        if Author.objects.filter(author_name=name).exists():
-            return Response({"error": "L\'auteur existe déjà."}, status=400)
+        #if Author.objects.filter(name).exists():
+            #return Response({"error": "L\'auteur existe déjà."}, status=400)
 
         # Valider le serializer.
         if serializer.is_valid():
@@ -147,7 +159,7 @@ class BookViewSet(viewsets.ModelViewSet):
         if serializer.is_valid():
 
              # Associer l'utilisateur actuel à la modification
-            serializer.created_by = request.user 
+            serializer.validated_data[created_by] = request.user 
             # Enregistrer l'objet dans la base de données.
             serializer.save()
 

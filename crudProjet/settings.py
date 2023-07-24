@@ -42,10 +42,11 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'rest_framework',
+    'rest_framework_simplejwt',
+    'drf_yasg',
     'crudProjet_api',
     # 'djanho_filters',
     #'auditlog',
-    'rest_framework_simplejwt'
  
 ]
 
