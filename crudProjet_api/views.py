@@ -4,7 +4,7 @@ from rest_framework import permissions
 from rest_framework import viewsets
 from rest_framework.response import Response
 from crudProjet_api.models import Author, Book
-from crudProjet_api.serializers import AuthorSerializer, BookSerializer
+from crudProjet_api.serializers import AuthorSerializer, BookSerializer,ChangePasswordSerializer,UpdateUserSerializer
 
 from .serializers import RegisterSerializer
 from rest_framework import generics
@@ -34,7 +34,7 @@ Cela facilite la gestion des URL et les associe automatiquement aux actions appr
 
 class RegisterView(generics.CreateAPIView):
     queryset = User.objects.all()
-    permission_classes = (AllowAny,)
+    permission_classes = [permissions.AllowAny]
     serializer_class = RegisterSerializer
 
 class ChangePasswordView(generics.UpdateAPIView):
@@ -50,7 +50,7 @@ class UpdateProfileView(generics.UpdateAPIView):
     serializer_class = UpdateUserSerializer
 
 class MyObtainTokenPairView(TokenObtainPairView):
-    permission_classes = (AllowAny,)
+    permission_classes = [permissions.AllowAny]
     serializer_class = MyTokenObtainPairSerializer
 
 class AuthorViewSet(viewsets.ModelViewSet):
@@ -72,10 +72,10 @@ class AuthorViewSet(viewsets.ModelViewSet):
         # Sérialiser les données de la demande.
         serializer = self.serializer_class(data=request.data)
         
-        #name = request.data.get('author_name')
+        name = request.data.get('author_name')
         # Vérification si l'auteur existe déjà
-        #if Author.objects.filter(name).exists():
-            #return Response({"error": "L\'auteur existe déjà."}, status=400)
+        if Author.objects.filter(name).exists():
+            return Response({"error": "L\'auteur existe déjà."}, status=400)
 
         # Valider le serializer.
         if serializer.is_valid():
@@ -152,7 +152,7 @@ class BookViewSet(viewsets.ModelViewSet):
         serializer = self.serializer_class(data=request.data)
         title = request.data.get('title')
                 # Vérification si l'auteur existe déjà
-        if Author.objects.filter(title=title).exists():
+        if Book.objects.filter(title).exists():
             return Response({"error": "Le livre existe déjà."}, status=400)
 
         # Valider le serializer.
