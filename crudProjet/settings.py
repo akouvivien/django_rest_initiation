@@ -45,10 +45,18 @@ INSTALLED_APPS = [
     'rest_framework_simplejwt',
     'drf_yasg',
     'crudProjet_api',
+    'corsheaders',
     # 'djanho_filters',
     #'auditlog',
  
 ]
+#empeche l'acces au site a tout le monde
+CORS_ORIGIN_ALLOW_ALL = False
+CORS_ORIGIN_WHITELIST = (
+    'http://localhost:8081',
+)
+
+# CORS_ORIGIN_WHITELIST = [] autorise l'acces a tout le monde
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -58,6 +66,8 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'corsheaders.middleware.CorsMiddleware',
+    'django.middleware.common.CommonMiddleware',
 ]
 
 ROOT_URLCONF = 'crudProjet.urls'
